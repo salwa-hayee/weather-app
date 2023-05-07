@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+    <style>
+      body {
+        font-family: arial, sans-serif;
+      }
+
+      h1 {
+        color: #7c7c7c;
+        font-size: 24px;
+        font-weight: 100;
+        line-height: 28px;
+        margin: 0;
+      }
+
+      ul {
+        margin: 0 0 10px;
+        padding: 0;
+      }
+
+      li {
+        color: #7c7c7c;
+        font-size: 16px;
+        font-weight: 100;
+        height: 19px;
+        line-height: 1;
+        list-style: none;
+      }
+
+      .weather-app {
+        border: 1px solid #dadde1;
+        padding: 15px;
+        margin: 20px auto;
+        border-radius: 10px;
+        max-width: 600px;
+      }
+
+      .weather-icon {
+        height: 64px;
+        width: 64px;
+        margin-right: 10px;
+      }
+
+      .temperature {
+        color: rgb(33, 33, 33);
+        font-size: 64px;
+        font-weight: 400;
+        line-height: 1;
+      }
+
+      .centigrade {
+        position: relative;
+        top: -34px;
+      }
+
+      .farenheit {
+        position: relative;
+        top: -34px;
+      }
+
+      .search-form {
+        margin-bottom: 20px;
+      }
+
+      .currentCity {
+        margin-top: 0px;
+        margin-bottom: 10px;
+
+        padding: 5px 35px;
+        border-radius: 5px;
+        border: none;
+        background: palegreen;
+        margin-left: 450px;
+      }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <title>Weather App</title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="weather-app">
+        <form class="search-form" id="search-form">
+          <div class="row">
+            <div class="col-9">
+              <input
+                type="search"
+                placeholder="Type a city.."
+                autofocus="on"
+                autocomplete="off"
+                class="form-control shadow-sm"
+                id="citySearch"
+              />
+            </div>
+            <div class="col-3">
+              <input
+                type="submit"
+                value="Search"
+                class="form-control btn btn-primary shadow-sm"
+              />
+            </div>
+          </div>
+        </form>
+        <button class="currentCity" id="currentCity">Current</button>
+        <h1>Sydney NSW, Australia</h1>
+        <ul>
+          <li id="timeToday">today</li>
+          <li>Partly Cloudy</li>
+        </ul>
+        <div class="row">
+          <div class="col-6">
+            <div class="clearfix">
+              <img
+                src="https://ssl.gstatic.com/onebox/weather/64/partly_cloudy.png"
+                alt="Cloudy icon"
+                class="weather-icon float-left"
+              />
+              <div class="float-left">
+                <span class="temperature" id="temperature">19</span
+                ><span class="centigrade" id="centigrade"
+                  ><a href="#">°C | </a></span
+                ><span class="farenheit" id="farenheit"
+                  ><a href="#">°F</a></span
+                >
+              </div>
+            </div>
+          </div>
+          <div class="col-6">
+            <ul>
+              <li>Precipitation: 0%</li>
+              <li>Humidity: 77%</li>
+              <li>Wind: 8 km/h</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      let now = new Date();
+      let days = [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+      ];
+      let currentDay = days[now.getDay()];
+      let currentHours = now.getHours().toString().padStart(2, "0");
+      let currentMinutes = now.getMinutes().toString().padStart(2, "0");
+
+      let today = document.querySelector("li#timeToday");
+      if (today) {
+        today.innerHTML = `${currentDay}, ${currentHours}:${currentMinutes}`;
+      }
+
+      function showTemperature(response) {
+        let temperature = Math.round(response.data.current.temp_c);
+        let newHeading = document.querySelector("#temperature");
+        newHeading.innerHTML = `${temperature}`;
+      }
+
+      function search(event) {
+        event.preventDefault();
+        let input = document.querySelector("#citySearch");
+        let h1 = document.querySelector("h1");
+        let apiKey = "b4c00dc0161645c3bcd82354230804";
+        let apiEndpoint = "https://api.weatherapi.com/v1/current.json?";
+
+        if (input.value) {
+          h1.innerHTML = `${input.value}`;
+        } else {
+          h1.innerHTML = null;
+          alert("Please type a city name");
+        }
+        let apiUrl = `${apiEndpoint}key=${apiKey}&q=${input.value}`;
+
+        axios.get(`${apiUrl}`).then(showTemperature);
+      }
+
+      let form = document.querySelector("#search-form");
+      if (form !== null) {
+        form.addEventListener("submit", search);
+      }
+      function showCity(response) {
+        let city = response.data.location.name;
+        let now = new Date();
+        let days = [
+          "Sunday",
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+        ];
+        let currentDay = days[now.getDay()];
+        let currentHours = now.getHours().toString().padStart(2, "0");
+        let currentMinutes = now.getMinutes().toString().padStart(2, "0");
+
+        let today = document.querySelector("li#timeToday");
+        if (today) {
+          today.innerHTML = `${currentDay}, ${currentHours}:${currentMinutes}`;
+        }
+
+        function showTemperature(response) {
+          let temperature = Math.round(response.data.current.temp_c);
+          let newHeading = document.querySelector("#temperature");
+          newHeading.innerHTML = `${temperature}`;
+        }
+
+        function search(event) {
+          event.preventDefault();
+          let input = document.querySelector("#citySearch");
+          let h1 = document.querySelector("h1");
+          let apiKey = "b4c00dc0161645c3bcd82354230804";
+          let apiEndpoint = "https://api.weatherapi.com/v1/current.json?";
+
+          if (input.value) {
+            h1.innerHTML = `${input.value}`;
+          } else {
+            h1.innerHTML = null;
+            alert("Please type a city name");
+          }
+          let apiUrl = `${apiEndpoint}key=${apiKey}&q=${input.value}`;
+
+          axios.get(`${apiUrl}`).then(showTemperature);
+        }
+
+        let form = document.querySelector("#search-form");
+        if (form !== null) {
+          form.addEventListener("submit", search);
+        }
+        function showCity(response) {
+          let city = response.data.location.name;
+          let h1 = document.querySelector("h1");
+          h1.innerHTML = `${city}`;
+        }
+
+        function currentTemp(event) {
+          let latitude = event.coords.latitude;
+          let longitude = event.coords.longitude;
+          let position = `${latitude}, ${longitude}`;
+
+          let apiKey = "b4c00dc0161645c3bcd82354230804";
+          let apiEndpoint = "https://api.weatherapi.com/v1/current.json?";
+
+          let apiUrl = `${apiEndpoint}key=${apiKey}&q=${position}`;
+
+          axios.get(`${apiUrl}`).then(showTemperature);
+          axios.get(`${apiUrl}`).then(showCity);
+        }
+
+        function getCurrentPosition() {
+          navigator.geolocation.getCurrentPosition(currentTemp);
+        }
+
+        let current = document.querySelector("#currentCity");
+        if (current !== null) {
+          current.addEventListener("click", getCurrentPosition);
+        }
+        let h1 = document.querySelector("h1");
+        h1.innerHTML = `${city}`;
+      }
+
+      function currentTemp(event) {
+        let latitude = event.coords.latitude;
+        let longitude = event.coords.longitude;
+        let position = `${latitude}, ${longitude}`;
+
+        let apiKey = "b4c00dc0161645c3bcd82354230804";
+        let apiEndpoint = "https://api.weatherapi.com/v1/current.json?";
+
+        let apiUrl = `${apiEndpoint}key=${apiKey}&q=${position}`;
+
+        axios.get(`${apiUrl}`).then(showTemperature);
+        axios.get(`${apiUrl}`).then(showCity);
+      }
+
+      function getCurrentPosition() {
+        navigator.geolocation.getCurrentPosition(currentTemp);
+      }
+
+      let current = document.querySelector("#currentCity");
+      if (current !== null) {
+        current.addEventListener("click", getCurrentPosition);
+      }
+    </script>
+  </body>
+</html>
